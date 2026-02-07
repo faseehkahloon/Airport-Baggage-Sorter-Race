@@ -1,40 +1,178 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<CodeBlocks_project_file>
-	<FileVersion major="1" minor="6" />
-	<Project>
-		<Option title="Airport Baggage Sorter Race" />
-		<Option pch_mode="2" />
-		<Option compiler="gcc" />
-		<Build>
-			<Target title="Debug">
-				<Option output="bin/Debug/Airport Baggage Sorter Race" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Debug/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-g" />
-				</Compiler>
-			</Target>
-			<Target title="Release">
-				<Option output="bin/Release/Airport Baggage Sorter Race" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Release/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-O2" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
-				</Linker>
-			</Target>
-		</Build>
-		<Compiler>
-			<Add option="-Wall" />
-			<Add option="-fexceptions" />
-		</Compiler>
-		<Unit filename="main.cpp" />
-		<Extensions>
-			<lib_finder disable_auto="1" />
-		</Extensions>
-	</Project>
-</CodeBlocks_project_file>
+#include <iostream>
+#include <cctype>
+#include <ctime>
+#include <cstdlib>
+#include <string>
+#include <fstream>
+
+using namespace std;
+
+// Initializing the score and lives of players
+int player1score = 0;
+int player2score = 0;
+int player1lives = 3;
+int player2lives = 3;
+
+// function for displaying information
+void displayinfo(){
+ cout<<"==== Airport Baggage Sorter Race ===="               <<endl;
+ cout<<"RULES:"                                              <<endl;
+ cout<<"1. Each bag label has a conveyer belt [A-D]."        <<endl;
+ cout<<"2. Match the bag label to its conveyer belt."        <<endl;
+ cout<<"3. Enter single character [A-D] else Invalid input." <<endl;
+ cout<<"4. For guessing correctly player gets 10 points."    <<endl;
+ cout<<"5. For guessing incorrectly player lose a life."     <<endl;
+ cout<<"6. Game will end when a player loses all lives."     <<endl;
+ cout<<"=====================================\n"             <<endl; }
+
+// array for conveyer belts
+ string conveyer[4]={"A", "B", "C", "D"};
+
+// array for baglables with countries
+string baglabels[8]={"USA - (LAX)", "Pakistan - (ISB)", "Brazil - (GRU)", "Australia - (SYD)",
+                     "UK - (LHR)", "France - (CDG)", "Thailand - (BKK)", "China - (PEK)"};
+
+// function for checking the condition of player1
+void condition_player1(string& p1, string& correctconveyer, int& player1score, int& player1lives){
+
+// Input validation checks if input is empty
+    if(p1.empty()){
+    cout<<"Player 1 | Invalid input! enter A-D"<<endl;
+    return;
+    }
+
+// Checks if input is not one character
+    if(p1.length()!=1){
+    cout<<"Player 1 | Invalid input! enter A-D"<<endl;
+    return;}
+
+// Uppercase the character
+    p1[0]=toupper(p1[0]);
+
+// Checks if input is A-D and and awards points or deducts life
+if (p1[0] >= 'A' && p1[0] <= 'D'){
+    if (p1==correctconveyer){
+    int points=10;
+    player1score += points;
+    cout<<"Player 1 | Correct! | +"<<points<<"Points"<<endl;}
+   else{
+    player1lives--;
+    cout<<"Player 1 | Wrong.   | Lives left :"<<player1lives<<endl;}
+} else{
+    cout<<"Player 1 | Invalid Input! enter A-D"<<endl;}
+}
+
+// function for checking the condition of player 2
+void condition_player2(string& p2, string& correctconveyer, int& player2score, int& player2lives){
+
+// Input validation checks if input is empty
+    if(p2.empty()){
+    cout<<"Player 2 | Invalid input! enter A-D"<<endl;
+    return;}
+
+// Checks if input is not one character
+    if(p2.length()!=1){
+    cout<<"Player 2 | Invalid input! enter A-D"<<endl;
+    return;}
+
+// Uppercase the character
+    p2[0] =toupper(p2[0]);
+
+// Checks if input is A-D and and awards points or deducts life
+if (p2[0] >= 'A' && p2[0] <= 'D'){
+    if (p2==correctconveyer){
+    int points=10;
+    player2score += points;
+    cout<<"Player 2 | Correct! | +"<<points<<"Points"<<endl;}
+   else{
+    player2lives--;
+    cout<<"Player 2 | Wrong.   | Lives left :"<<player2lives<<endl;}
+}else{
+    cout<<"Player 2 | Invalid input! enter A-D"<<endl;}}
+
+// function for saving score in file
+void save_scr(){
+ofstream file ("scoreboard.txt", ios::app);
+if (file.is_open ()){
+    file<<"Player 1 score :"<<player1score<<", Player 2 score :"<<player2score<<endl;
+    file.close();
+    cout<<"\nScores saved to scoreboard.txt"<<endl;
+}else{
+ cout<<"Error saving scores."<<endl;}
+}
+
+// function for reading and opening the file
+void read_scr(){
+ifstream file("scoreboard.txt");
+if (file.is_open()) {
+        string line;
+        cout << "=== Previous Scores ===" << endl;
+        while (getline(file, line)) {
+            cout << line << endl;}
+        cout << "=======================\n" << endl;
+        file.close();
+}else {
+ cout << "No previous scores found.\n\n";}
+}
+
+int main(){
+  srand(time(0));
+  displayinfo();
+  read_scr();
+
+  while(player1lives>0 && player2lives>0){
+
+  // to randomise the no of bags
+  int bagindex = rand()%8;
+  string baglabel = baglabels[bagindex];
+
+  // assigning countries to conveyers belts
+  string correctconveyer = conveyer[bagindex/2];
+  cout<<"---- New Bag Arrived ----"<<endl;
+  cout<<"Bag Label :" <<baglabel <<endl;
+  cout<<"Conveyers :[A] [B] [C] [D]"<<endl;
+
+  // taking input of player 1
+  string p1;
+  cout<<"Player 1 enter conveyer (A-D) :";
+  getline(cin,p1); // Allows space , enter
+
+  // taking input of player 2
+  string p2;
+  cout<<"Player 2 enter conveyer (A-D) :";
+  getline(cin,p2); // Allows space , enter
+
+  // for adding a new line
+  cout<<endl;
+
+  // calling function for player 1
+  condition_player1(p1,correctconveyer,player1score,player1lives);
+
+  // calling function for player 2
+  condition_player2(p2,correctconveyer,player2score,player2lives);
+
+  // displaying current score
+  cout<<"\nCurrent scores :"<<endl;
+  cout<<"Player 1  : " <<player1score <<" Points, lives : " <<player1lives<<endl;
+  cout<<"Player 2  : " <<player2score <<" Points, lives : " <<player2lives<<"\n"<<endl;
+  }
+  // displaying the final score
+  cout<<"==== Game Over ===="<<endl;
+  if(player1score>player2score)
+    cout<<"Player 1 Wins !"<<endl;
+  else if(player2score>player1score)
+    cout<<"Player 2 Wins !"<<endl;
+  else
+    cout<<"It's a Tie !"<<endl;
+
+  cout<<"Final Scores:"<<endl;
+  cout<<"Player 1 Score : "<<player1score<<" Points"<<endl;
+  cout<<"Player 2 Score : "<<player2score<<" Points"<<endl;
+  cout<<"====           ===="<<endl;
+
+  // calling function for saving scoreboard
+  save_scr();
+
+    return 0;
+}
+
